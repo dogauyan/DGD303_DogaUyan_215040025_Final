@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f0c4731bd42d8545bf5c2ea3f6756fc, type: 3}
+  m_Name: Base_SpSet
+  m_EditorClassIdentifier: 
+  Ships:
+  - {fileID: 21300000, guid: 86dd48b0becabda47a12722ec79c18a5, type: 3}
+  - {fileID: 21300000, guid: 0bd9ccbe7b518e1459153920ad9dbeaf, type: 3}
+  - {fileID: 21300000, guid: c1d067059e3e7484b92b73ec3bd6c320, type: 3}
+  - {fileID: 21300000, guid: 16d5f36bfdb83924c9570deb5497935c, type: 3}
+  - {fileID: 21300000, guid: eb3b21fa72d0957468770a50e816cf3a, type: 3}
+  - {fileID: 21300000, guid: 7f706a7a092fb3a47b8648888573ad55, type: 3}
+  - {fileID: 21300000, guid: 3ad33f70d517110428d89e0e0caada85, type: 3}
+  - {fileID: 21300000, guid: 8c6fdc22c62d1bc46943a9fc18dba073, type: 3}
+  - {fileID: 21300000, guid: 31743b127ff2bcb468040f958e05a1f3, type: 3}
+  - {fileID: 21300000, guid: 8deda068e5b7b204cbfc3d02a201695c, type: 3}
+  - {fileID: 21300000, guid: 581ab16a4cd5ef748bb296490270ade5, type: 3}
+  - {fileID: 21300000, guid: 66751031470d02e419db541982e4fd90, type: 3}
+  - {fileID: 21300000, guid: 11cee434cb4b8794194912876266095e, type: 3}
+  pathType: 1
+  pathMode: 2
+  MotionPaths:
+  - path:
+    - {x: 0, y: 6, z: 0}
+    - {x: 0, y: -6, z: 0}
+  - path:
+    - {x: 0, y: 6, z: 0}
+    - {x: 1, y: 5, z: 0}
+    - {x: -1, y: 3, z: 0}
+    - {x: 1, y: 1, z: 0}
+    - {x: -1, y: -1, z: 0}
+    - {x: 1, y: -3, z: 0}
+    - {x: -1, y: -5, z: 0}
+    - {x: 0, y: -6, z: 0}
