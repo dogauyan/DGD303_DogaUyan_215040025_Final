@@ -1,15 +1,19 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerShipController : MonoBehaviour
 {
+    public AudioSource audioSource;
+    public GameObject boom;
     byte sprIndex = 2;
     public Sprite[] turnSprites;
     public SpriteRenderer spriteRenderer;
     Vector3 currentVelocity;
     public ProjectileMovement bullet;
     public float attackSpeed;
+    bool _firing;
 
     // Start is called before the first frame update
     void Start()
@@ -20,6 +24,9 @@ public class PlayerShipController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (GameManager.state == GameManager.GameState.ESC) return;
+        if (audioSource.outputAudioMixerGroup == null && VolumeManager.SoundFx != null) audioSource.outputAudioMixerGroup = VolumeManager.SoundFx;
+
         // fare konumunu al
         Vector3 Fare = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Fare.x = Mathf.Clamp(Fare.x, -3.5f, 3.5f);
@@ -44,10 +51,12 @@ public class PlayerShipController : MonoBehaviour
         // fare tikliyken ates et
         if (Input.GetMouseButtonDown(0))
         {
+            _firing = true;
             StartCoroutine(Firing());
         }
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButtonUp(0) || (_firing && !Input.GetMouseButton(0)))
         {
+            _firing = false;
             StopAllCoroutines();
         }
     }
@@ -57,8 +66,15 @@ public class PlayerShipController : MonoBehaviour
         while (true)
         {
             Instantiate(bullet).transform.position = transform.position;
-
+            audioSource.PlayOneShot(audioSource.clip);
             yield return new WaitForSeconds(1/attackSpeed);
         }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        transform.DOKill();
+        Instantiate(boom).transform.position = transform.position;
+        Destroy(gameObject);
     }
 }

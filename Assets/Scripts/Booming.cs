@@ -7,7 +7,7 @@ public class Booming : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        GetComponent<AudioSource>().outputAudioMixerGroup = VolumeManager.SoundFx;
     }
 
     // Update is called once per frame

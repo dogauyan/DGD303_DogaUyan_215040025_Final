@@ -6,6 +6,7 @@ public class ProjectileMovement : MonoBehaviour
 {
     public float speed;
     public Vector3 direction;
+    bool done;
 
     // Start is called before the first frame update
     void Start()
@@ -16,6 +17,8 @@ public class ProjectileMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (GameManager.state == GameManager.GameState.ESC) return;
+
         transform.Translate(speed * Time.deltaTime * direction);
         if (transform.position.y > 6 || transform.position.y < -6)
         {
@@ -25,11 +28,12 @@ public class ProjectileMovement : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Debug.Log("collision");
+        if (done) return;
 
         EnemyController enemy = collision.gameObject.GetComponent<EnemyController>();
         if (enemy != null)
         {
+            done = true;
             enemy.KaBoom(true);
             Destroy(gameObject);
         }

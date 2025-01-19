@@ -148,6 +148,7 @@ MonoBehaviour:
   Firing: 0
   attackSpeed: 0
   path: []
+  spriteRenderer: {fileID: 3171321935196331758}
   boom: {fileID: 8283312416855841413, guid: fa1f9d4fdc1fbed4f9ce35e727612462, type: 3}
 --- !u!50 &7751679398669054951
 Rigidbody2D:

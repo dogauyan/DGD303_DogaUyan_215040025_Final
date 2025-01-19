@@ -31,7 +31,7 @@ public class Spawner : MonoBehaviour
     public enum MotionType
     {
         Vertical,
-        Wavey,
+        Dance,
         Standoff,
         Zigzag,
         Positioned
@@ -52,28 +52,42 @@ public class Spawner : MonoBehaviour
     public SpawnerSettings settings;
     public EnemyController enemy;
     float timer = 0;
+    bool spawning = true;
+    static public byte EnemyShipCount;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        EnemyShipCount = 0;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (waveIndex == enemyWaves.Length) return;
+        if (GameManager.state == GameManager.GameState.ESC) return;
+        if (waveIndex == enemyWaves.Length)
+        {
+            if (!spawning && EnemyShipCount == 0)
+            {
+                GameManager.Ended = true;
+            }
+            return;
+        }
 
         timer += Time.deltaTime;
-        if (timer >= enemyWaves[waveIndex].delay)
+        while (timer >= enemyWaves[waveIndex].delay)
         {
             timer -= enemyWaves[waveIndex].delay;
             SpawnWave(enemyWaves[waveIndex]);
+
+            if (waveIndex == enemyWaves.Length) break;
         }
     }
 
     void SpawnWave(EnemyWave wave)
     {
+        spawning = true;
+
         switch (wave.spawn)
         {
             case SpawnType.Repeater:
@@ -96,46 +110,120 @@ public class Spawner : MonoBehaviour
     {
         byte _i = 0;
         float _start = Random.Range(-4.5f, 4.5f);
-        List<Vector3> _motion = new();
-        Vector3 _point = new Vector3(_start,6,0);
-        while (true)
-        {
-            _point.x += Random.Range(-4.5f, 4.5f);
-            _point.x = Mathf.Clamp(_point.x, -4.5f, 4.5f);
-
-            _point.y -= Random.Range(-0.5f, 2);
-            _point.y = Mathf.Clamp(_point.y, -6, 6);
-
-            _motion.Add(_point);
-
-            if (_i++ >= 32)
-            {
-                _point.x += Random.Range(-4.5f, 4.5f);
-                _point.x = Mathf.Clamp(_point.x, -4.5f, 4.5f);
-
-                _point.y = -6;
-
-                _motion.Add(_point);
-            }
-            if (_point.y <= -6) break;
-        }
+        GenerateMotion(wave.motion, new Vector3(_start, 6, 0), out List<Vector3> _motion, out PathType ptype);
 
         float realizedDuration = (float)_motion.Count / (float)wave.intendedSteps;
 
         _i = 0;
         while (true)
         {
+            if (GameManager.state == GameManager.GameState.ESC)
+            {
+                yield return null;
+            }
+
+            EnemyShipCount++;
             var _enemy = Instantiate(enemy);
+            _enemy.spriteRenderer.sprite = settings.Ships[(int)wave.ships[0]];
             _enemy.path = _motion.ToArray();
             _enemy.transform.position = _enemy.path[0];
-            _enemy.transform.DOPath(_enemy.path, wave.duration * realizedDuration, settings.pathType, settings.pathMode).OnComplete(() => { _enemy.KaBoom(false); });
+            _enemy.transform.DOPath(_enemy.path, wave.duration * realizedDuration, ptype, default).SetEase(Ease.Flash).OnUpdate(() => { _enemy.transform.rotation = default; }).OnComplete(() => { _enemy.KaBoom(false); });
 
             if (++_i >= wave.count)
             {
+                spawning = false;
                 break;
             }
 
             yield return new WaitForSeconds(wave.gap);
+        }
+
+    }
+
+    void GenerateMotion(MotionType type, Vector3 _point, out List<Vector3> _motion, out PathType ptype)
+    {
+        byte _i = 0;
+        switch (type)
+        {
+            case MotionType.Vertical:
+                _motion = new() { _point };
+
+                _point.y = -6;
+                _motion.Add(_point);
+
+                ptype = PathType.Linear;
+                break;
+            case MotionType.Dance:
+                ptype = PathType.CatmullRom;
+                _motion = new() { _point };
+
+                while (true)
+                {
+                    _point.x += Random.Range(-3.5f, 3.5f);
+                    _point.x = Mathf.Clamp(_point.x, -3.5f, 3.5f);
+
+                    _point.y -= Random.Range(-1, 3);
+                    _point.y = Mathf.Clamp(_point.y, -6, 6);
+
+                    _motion.Add(_point);
+
+                    if (_i++ >= 32)
+                    {
+                        _point.x += Random.Range(-3.5f, 3.5f);
+                        _point.x = Mathf.Clamp(_point.x, -3.5f, 3.5f);
+
+                        _point.y = -6;
+
+                        _motion.Add(_point);
+                    }
+                    if (_point.y <= -6) break;
+                }
+
+                break;
+            case MotionType.Zigzag:
+                ptype = PathType.Linear;
+                _motion = new() { _point };
+
+                bool yatay = false;
+                bool sag = true;
+                while (true)
+                {
+                    if (yatay)
+                    {
+                        if (sag)
+                        {
+                            _point.x += Random.Range(1, 7f);
+                        }
+                        else
+                        {
+                            _point.x -= Random.Range(1, 7f);
+                        }
+
+                        sag = !sag;
+                        _point.x = Mathf.Clamp(_point.x, -3.5f, 3.5f);
+                    } 
+                    else
+                    {
+                        _point.y -= Random.Range(1, 3);
+                        _point.y = Mathf.Clamp(_point.y, -6, 6);
+                    }
+                    yatay = !yatay;
+
+                    _motion.Add(_point);
+
+                    if (_i++ >= 32)
+                    {
+                        _point.y = -6;
+
+                        _motion.Add(_point);
+                    }
+                    if (_point.y <= -6) break;
+                }
+                break;
+            default:
+                ptype = PathType.Linear;
+                _motion = null;
+                break;
         }
     }
 }

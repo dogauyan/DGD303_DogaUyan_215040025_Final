@@ -10,6 +10,7 @@ public class EnemyController : MonoBehaviour
     public float attackSpeed;
 
     public Vector3[] path;
+    public SpriteRenderer spriteRenderer;
     public GameObject boom;
 
     // Start is called before the first frame update
@@ -30,9 +31,10 @@ public class EnemyController : MonoBehaviour
         {
             // odul
             transform.DOKill();
+            Instantiate(boom).transform.position = transform.position;
         }
 
-        Instantiate(boom).transform.position = transform.position;
+        Spawner.EnemyShipCount--;
         Destroy(gameObject);
     }
 }

@@ -27,7 +27,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 66751031470d02e419db541982e4fd90, type: 3}
   - {fileID: 21300000, guid: 11cee434cb4b8794194912876266095e, type: 3}
   pathType: 1
-  pathMode: 2
+  pathMode: 0
   MotionPaths:
   - path:
     - {x: 0, y: 6, z: 0}
